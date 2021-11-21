@@ -1,0 +1,26 @@
+name: RetroVisor
+options:
+  indentWidth: 2
+  tabWidth: 2
+  deploymentTarget: 
+    iOS: "12.1"
+targets:
+  RetroVisor:
+    type: framework
+    platform: iOS
+    postCompileScripts:
+      - script: ${PODS_ROOT}/Swiftlint/swiftlint
+        name: SwiftLint
+    sources: RetroVisor
+    scheme:
+      gatherCoverageData: true
+      testTargets:
+        - name: RetroVisorTests
+          randomExecutionOrder: true
+          parallelizable: true
+  RetroVisorTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: RetroVisorTests
+    dependencies:
+      - target: RetroVisor
