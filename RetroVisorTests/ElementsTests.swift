@@ -189,4 +189,21 @@ class ElementsTests: XCTestCase {
     XCTAssertEqual(matches.count, 1)
     XCTAssertEqual(matches.first, ipsView)
   }
+
+  func testFindsNestedView() {
+    let parentView = UIView()
+    let innerView = UIView()
+    let button = makeButton("test")
+
+    innerView.addSubview(button)
+    parentView.addSubview(innerView)
+
+    let results = parentView.elements.matching("test")
+    XCTAssertEqual(results.first, button)
+
+    let res2 = parentView.elements.matching { (button: UIButton) in
+      button.title(for: .normal) == "test"
+    }
+    XCTAssertEqual(res2.first, button)
+  }
 }

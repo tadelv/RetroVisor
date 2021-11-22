@@ -8,7 +8,7 @@ RetroVisor works by recursively searching a given UIView's subviews for views th
 
 It is trying to mimic the behavior of `XCUIElement` by providing an interface for querying a view for its sub-elements
 
-####It supports: 
+#### It supports: 
 
 - finding views with text that contains a given string, i.e.:
 
@@ -21,7 +21,7 @@ let viewsThatContainAbc = myViewController.view.elements.containing("abc")
 
 ```swift
 // an array of views, which display the text 'abc'
-let viewsThatContainAbc = myViewController.view.elements.matching("abc")
+let viewsThatMatchAbc = myViewController.view.elements.matching("abc")
 ```
 
 - finding views that are of specific type:
@@ -37,6 +37,14 @@ let buttons = myViewController.view.elements.of(UIButton.self)
 // an array of UILabels which have red text color
 let redLabels = myViewController.view.elements.of(UILabel.self).matching { label in
   label.textColor == .red
+}
+
+// OR
+
+// specify which types you want to match by specifying the closure parameter type 
+let doneButton = myViewController.view.elements.matching { (button: UIButton) in
+  button.title(for: .normal) == "Done" && 
+    button.isEnabled == true
 }
 ```
 
@@ -54,7 +62,7 @@ Note that tapping is implemented a bit clumsiliy, as sending UIControl Action ev
 
 ```swift
 // tap on a custom view
-let label = myViewController.view.elements["Tap here for more info"].first
+let label = myViewController.view.elements.of(UILabel.self)["Tap here for more info"].first
 label?.tap()
 ```
 
@@ -81,6 +89,16 @@ target "MyApp" do
   end
 end
 ```
+
+You can also install it through CocoaPods
+
+```ruby
+pod 'RetroVisor'
+```
+
+## Contributing
+
+Contributions are very welcome, in form of Pull Requests. The project could also do with more unit tests for more specialized cases.
 
 ## License
 

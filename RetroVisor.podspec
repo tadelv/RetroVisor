@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "RetroVisor"
-  spec.version      = "0.1.0"
+  spec.version      = "0.2.0"
   spec.summary      = "Tools to help with UnitTesting UIViews"
 
 

@@ -7,11 +7,6 @@
 
 import UIKit
 
-/// Allow RetroVisor to find a custom UIView subtype by text by implementing this protocol
-public protocol TextFindable {
-  var text: String { get }
-}
-
 public struct Elements<T: UIView> {
   public typealias ElementsType = [T]
   private let elements: ElementsType
@@ -62,10 +57,21 @@ public extension Elements {
   func matching(_ predicate: (Element) -> Bool) -> Elements {
     let matching = Array(Set(elements + elements.flatMap { $0.elements.of(Element.self) }))
       .filter { predicate($0) }
-    let ancestors = Set(matching.compactMap { child in
-      elements.first(where: child.isDescendant(of:))
-    })
+    let ancestors = matching.filter { element in
+      !matching.contains { element != $0 && element.isDescendant(of: $0) }
+    }
     return Elements(Array(ancestors))
+  }
+
+  func matching<U: UIView>(_ predicate: (U) -> Bool) -> Elements<U> {
+    let matching = Set(elements + elements.flatMap { $0.elements })
+      .compactMap { element -> U? in
+        guard let el = element as? U else {
+          return nil
+        }
+        return predicate(el) ? el : nil
+      }
+    return Elements<U>(Array(matching))
   }
 
   subscript(_ text: String) -> Elements {
@@ -74,6 +80,12 @@ public extension Elements {
 
   private func findText(_ subject: UIView, comparator: (String) -> Bool) -> Bool {
     if let findable = subject as? TextFindable {
+      return comparator(findable.text)
+    }
+    if let findable = subject as? OptionalTextFindable {
+      return findable.text != nil ? comparator(findable.text!) : false
+    }
+    if let findable = subject as? ImplicitTextFindable {
       return comparator(findable.text)
     }
     let selector = Selector(("text"))
