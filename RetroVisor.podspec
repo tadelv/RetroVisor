@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
 
   spec.homepage     = "https://github.com/tadelv/RetroVisor"
 
-  spec.license      = "MIT"
+  spec.license      = { :type => 'MIT', :file => 'LICENSE' }
   spec.author       = { "Vid Tadel" => "vid@tadel.net" }
 
   spec.platform     = :ios, "12.1"

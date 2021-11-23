@@ -2,6 +2,8 @@
 
 RetroVisor helps you with inspecting UIViews in your unit tests. You do test views in unit tests, right? Right?
 
+Usually, I mark subview properties of my custom views as `private`, which I think is the right practice, only exposing what is really needed to use a certain view. This makes testing said views a bit more complex, since there is no way to access those private members in the Unit Test target. This is where RetroVisor comes to help. It adds a new property on UIView and subclasses, called `elements`, which contains all the views subviews (recursively, skipping class names starting with `_` or UIKit private classes) and allows for `Collection` like operations on these elements. It also provides matching and filtering helper functions, which help you find the specific view you are looking for more easily.
+
 ## Retro What?
 
 RetroVisor works by recursively searching a given UIView's subviews for views that match a certain criteria. Additionally it provides (very crude) functionality for simulating tapping on said views. 
@@ -68,6 +70,38 @@ label?.tap()
 
 Oh yes, it also supports subscripting on the `elements` property. A subscript means RetroVisor will search for a view with an exact text match, i.e. it is equivalent to calling `view.elements.matching(text)`.
 
+### Using RetroVisor with your own UIView subclasses
+
+The fastest way is to specify the type you are looking for in the matcher predicate
+
+```swift
+let customSubview = view.elements.matching { (subview: MyCustomViewClass) in
+  true
+}.first
+```
+
+But RetroVisor also provides Protocols through which it can search for text in the custom UI elements. These protocols are `TextFindable`, `OptionalTextFindable` and `ImplicitTextFindable`. Extend your custom UIView subclass with one of these protocols in your Unit Tests and RetroVisor will be able to search for it via the exposed `text` property.
+
+```swift
+extension CustomView: TextFindable {
+  public var text: String {
+    "I am a custom view"
+  }
+}
+
+// In your XCTestCase
+let customView = view.elements.containing("custom").first // finds the CustomView
+```
+
+RetroVisor uses these protocols under the hood for some common UIKit classes. Here is an example on how it extends `UIButton` to make it searchable by text
+
+```swift
+extension UIButton: OptionalTextFindable {
+  public var text: String? {
+    title(for: state)
+  }
+}
+```
 
 ## Running
 
